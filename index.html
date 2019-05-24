@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.min.js"
+    ></script>
+    <script
+      language="javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js"
+    ></script>
+    <script
+      language="javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.sound.min.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="sketch.js"
+    ></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=.5" />
+    <style></style>
+  </head>
+
+  <body>
+    <div id="sketch_holder"></div>
+    <div id="options_div">
+      <div id="slider_div">
+        <div class="controls_text">Volume</div>
+        <input
+          id="volume"
+          type="range"
+          min="0"
+          max="100"
+          value="100"
+          class="slider"
+        />
+      </div>
+      <div id="button_div">
+        <div class="controls_text">
+          Difficulty
+        </div>
+        <button id="easy_btn" class="btn" onclick="setActiveAI(AI_button_arr[0])">
+          Easy
+        </button>
+        <button id="med_btn" class="btn" onclick="setActiveAI(AI_button_arr[1])">
+          Medium
+        </button>
+        <button id="hard_btn" class="btn" onclick="setActiveAI(AI_button_arr[2])">
+          Hard
+        </button>
+      </div>
+      <div id="dropdown_div">
+        <div class="controls_text">
+          Color Theme
+        </div>
+        <select id="color_theme_dropdown" onChange="changeColorTheme2(this);">
+          <option value="default">Default</option>
+          <option value="neon">Neon</option>
+          <option value="evil">Evil</option>
+        </select>
+      </div>
+    </div>
+    <script src="sketch.js"></script>
+    <script src="Paddle.js"></script>
+    <script src="Ball.js"></script>
+    <script src="Game.js"></script>
+    <script src="Transitions.js"></script>
+    <script src="Elements.js"></script>
+    <script src="Setups.js"></script>
+    <script src="PaddleAI.js"></script>
+    <script src="ColorThemes.js"></script>
+    <script src="Sounds.js"></script>
+  </body>
+</html>
