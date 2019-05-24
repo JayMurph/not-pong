@@ -29,32 +29,51 @@ function setupSlider() {
 }
 
 function setupColorThemes() {
-  defaultColorTheme = new ColorTheme(
-    color(255),
-    color(255, 255, 255),
-    color(255),
-    color(0, 0, 0),
-    color(220),
-    color(255),
-    color(0)
+  //add new color themes by defining a new ColorTheme object within this
+  //push function
+  color_themes_arr.push(
+    new ColorTheme(
+      "default",
+      "Default",
+      color(255),
+      color(255, 255, 255),
+      color(255),
+      color(0, 0, 0),
+      color(220),
+      color(255),
+      color(0)
+    ),
+    new ColorTheme(
+      "neon",
+      "Neon",
+      color("#00cc00"),
+      color("#00cc00"),
+      color("#00b300"),
+      color("#1aff1a"),
+      color(0),
+      color("#00b300"),
+      color("#1aff1a")
+    ),
+    new ColorTheme(
+      "evil",
+      "Evil",
+      color("#e60000"),
+      color("#e6e600"),
+      color("#cc0000"),
+      color("#cc0000"),
+      color("#000000"),
+      color("#e6e600"),
+      color("#e60000")
+    )
   );
-  neonColorTheme = new ColorTheme(
-    color("#00cc00"),
-    color("#00cc00"),
-    color("#00b300"),
-    color("#1aff1a"),
-    color(0),
-    color("#00b300"),
-    color("#1aff1a")
-  );
-  evilColorTheme = new ColorTheme(
-    color("#e60000"),
-    color("#e6e600"),
-    color("#cc0000"),
-    color("#cc0000"),
-    color("#000000"),
-    color("#e6e600"),
-    color("#e60000")
-  );
-  game_state.current_color_theme = defaultColorTheme;
+  game_state.current_color_theme = color_themes_arr[0];
+
+  //creates drop-down-menu option elements from the color theme array
+  let select = document.getElementById('color_theme_dropdown');
+  for(let i = 0; i < color_themes_arr.length; i++){
+    let opt = document.createElement('option');
+    opt.value = color_themes_arr[i].id;
+    opt.innerHTML = color_themes_arr[i].text;
+    select.appendChild(opt);
+  }
 }
