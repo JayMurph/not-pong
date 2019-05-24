@@ -1,5 +1,7 @@
 class ColorTheme {
-  constructor(bc, bhc, pc, ttc, bgc, mlc, sc) {
+  constructor(id, text, bc, bhc, pc, ttc, bgc, mlc, sc) {
+    this.id = id;
+    this.text = text;
     this.ball_color = bc;
     this.ball_history_color = bhc;
     this.paddle_color = pc;
@@ -10,21 +12,17 @@ class ColorTheme {
   }
 }
 
-var defaultColorTheme;
-var neonColorTheme;
-var evilColorItem;
-
 function changeColorTheme_aux(theme_choice) {
-  if (theme_choice == "neon") {
-    game_state.current_color_theme = neonColorTheme;
-  } else if (theme_choice == "default") {
-    game_state.current_color_theme = defaultColorTheme;
-  } else if (theme_choice == "evil") {
-    game_state.current_color_theme = evilColorTheme;
+  for(let i = 0; i < color_themes_arr.length; i++){
+    if(color_themes_arr[i].id == theme_choice){
+      game_state.current_color_theme = color_themes_arr[i]
+    }
   }
 }
 
-function changeColorTheme2(sel) {
+function changeColorTheme(sel) {
   var selected_theme = sel.options[sel.selectedIndex].value;
   changeColorTheme_aux(selected_theme);
 }
+
+var color_themes_arr = [];
