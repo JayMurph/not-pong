@@ -1,3 +1,4 @@
+var AI_button_arr;
 function setupAI() {
   AI_button_arr = [
     new AI_Button("easy_btn", 0.002),

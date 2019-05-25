@@ -6,7 +6,7 @@ class State {
     this.you_lose_flag = 0;
     this.pause_flag = 0;
     this.mouse_off_canvas = 0;
-    this.winning_score = 2;
+    this.winning_score = 10;
     this.current_color_theme;
     this.ball;
     this.paddle_1;
@@ -37,11 +37,11 @@ class State {
   }
 }
 
-function scoreEvent(p1, p2, b) {
-  if (b.x >= screen_width) {
+function scoreEvent(p1, p2, b_x) {
+  if (b_x >= screen_width) {
     p1.score += 1;
     game_state.new_round_flag = 1;
-  } else if (b.x <= 0) {
+  } else if (b_x <= 0) {
     p2.score += 1;
     game_state.new_round_flag = 1;
   }

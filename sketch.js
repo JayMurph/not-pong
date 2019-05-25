@@ -1,7 +1,6 @@
 let screen_width = 800;
 let screen_height = 500;
 var game_font;
-var AI_button_arr;
 
 function preload() {
   bounce_sound_1 = loadSound("bounce1.wav", loaded);
@@ -35,14 +34,14 @@ function draw() {
 function play(p1, p2, b) {
   p1.updatePosition(
     _paddle_1_default_x,
-    mouseY - p1.height / 2
+    mouseY - p1.dimension.height / 2
   );
   p2.updatePosition(
     _paddle_2_default_x,
-    game_state.paddle_AI.generateRandomY(b, p2)
+    game_state.paddle_AI.generateRandomY(b.position.y, p2.dimension.height)
   );
   b.update(p1, p2);
-  scoreEvent(p1, p2, b);
+  scoreEvent(p1, p2, b.position.x);
 }
 
 function show(p1, p2, b) {

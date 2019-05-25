@@ -1,15 +1,13 @@
 class Ball {
-  constructor(d, x, y, x_velocity, y_velocity) {
-    this.d = d;
-    this.r = this.d / 2;
-    this.x = x;
-    this.y = y;
-    this.x_velocity = x_velocity; //8;
-    this.y_velocity = y_velocity; //3;
-    this.vel_inc = 1.01;
+  constructor(diameter, x_coord, y_coord, x_velocity, y_velocity) {
+    this.diameter = diameter;
+    this.radius = this.diameter / 2;
+    this.position = { x: x_coord, y: y_coord };
+    this.velocity = { x: x_velocity, y: y_velocity };
+    this.velocity_incrementer = 1.01;
     this.bounce_direction_multiplier = 9;
     this.time_since_last_p_collision = 0;
-    this.time_since_last_b_collision = 0;
+    this.time_since_last_w_collision = 0;
     this.collision_buffer = 12;
     this.paddle_collision_counter = 0;
     this.current_total_history = 4;
@@ -19,7 +17,7 @@ class Ball {
   show(ball_color, history_color) {
     this.showHistory(history_color);
     fill(ball_color);
-    ellipse(this.x, this.y, this.d);
+    ellipse(this.position.x, this.position.y, this.diameter);
   }
   showHistory(history_color) {
     push();
@@ -30,53 +28,69 @@ class Ball {
       ellipse(
         this.history[b].x,
         this.history[b].y,
-        (b / this.history.length) * this.d
+        (b / this.history.length) * this.diameter
       );
     }
     pop();
   }
-  get p_collision_buffer_over (){
-    return (this.time_since_last_p_collision > this.collision_buffer);
+  get p_collision_buffer_over() {
+    return this.time_since_last_p_collision > this.collision_buffer;
   }
-  get b_collision_buffer_over (){
-    return (this.time_since_last_b_collision > this.collision_buffer);
+  get b_collision_buffer_over() {
+    return this.time_since_last_w_collision > this.collision_buffer;
   }
-  detectCollisionPaddles(p1, p2) {
-    if (
-      Math.abs(this.x - (p1.x + p1.width / 2)) <= p1.width / 2 + this.r &&
-      Math.abs(this.y - (p1.y + p1.height / 2)) <= p1.height / 2 + this.r &&
-      this.p_collision_buffer_over
-    ) {
-      return p1;
-    } else if (
-      Math.abs(this.x - (p2.x + p2.width / 2)) <= p2.width / 2 + this.r &&
-      Math.abs(this.y - (p2.y + p2.height / 2)) <= p2.height / 2 + this.r &&
-      this.p_collision_buffer_over
-    ) {
-      return p2;
+  detectCollisionPaddles(paddles) {
+    if (this.p_collision_buffer_over) {
+      let b_pos = this.position;
+      for (let i = 0; i < paddles.length; i++) {
+        let p_pos = paddles[i].position;
+        let p_dim = paddles[i].dimension;
+        //distance along x-axis from center of ball to center of paddle
+        let ball_to_p_dist_x = Math.abs(b_pos.x - (p_pos.x + p_dim.width / 2));
+        //minimum distance to be a collision along x-axis
+        let minimum_dist_x = p_dim.width / 2 + this.radius;
+        //distance along y-axis from center of ball to center of paddle
+        let ball_to_p_dist_y = Math.abs(b_pos.y - (p_pos.y + p_dim.height / 2));
+        //minimum distance to be a collision along y-axis
+        let minimum_dist_y = p_dim.height / 2 + this.radius;
+        if (
+          ball_to_p_dist_x <= minimum_dist_x &&
+          ball_to_p_dist_y <= minimum_dist_y
+        ) {
+          return paddles[i];
+        }
+      }
     }
     return false;
   }
   detectCollisionTopBottomWall() {
-    return ((this.y > screen_height - this.r || this.y < this.r) &&
-        this.b_collision_buffer_over)
+    return (
+      (this.position.y > screen_height - this.radius ||
+        this.position.y < this.radius) &&
+      this.b_collision_buffer_over
+    );
   }
   detectCollisionLeftRightWall() {
-    return ((this.x <= this.r || this.x >= screen_width - this.r) &&
-        this.b_collision_buffer_over);
+    return (
+      (this.position.x <= this.radius ||
+        this.position.x >= screen_width - this.radius) &&
+      this.b_collision_buffer_over
+    );
   }
   calculatePaddleBounceDirection(p) {
+    let p_pos = p.position;
+    let p_dim = p.dimension;
     return (
-      ((this.y - (p.y + p.height / 2)) / p.height) *
+      ((this.position.y - (p_pos.y + p_dim.height / 2)) / p_dim.height) *
       this.bounce_direction_multiplier
     );
   }
-  bounceOffTopBottomWall(){
-      this.y_velocity = -this.y_velocity;
+  bounceOffTopBottomWall() {
+    this.velocity.y = -this.velocity.y;
   }
-  bounceOffPaddle(colliding_p){
-      this.x_velocity = -(this.x_velocity * this.vel_inc);
-      this.y_velocity = this.calculatePaddleBounceDirection(colliding_p);
+  bounceOffPaddle(colliding_p) {
+    this.velocity.x = -(this.velocity.x * this.velocity_incrementer);
+    this.velocity.y = this.calculatePaddleBounceDirection(colliding_p);
   }
   updateHistory(add_history) {
     if (
@@ -86,42 +100,40 @@ class Ball {
     ) {
       this.current_total_history += 1;
     }
-    let vec = createVector(this.x, this.y);
+    let vec = createVector(this.position.x, this.position.y);
     this.history[this.history.length] = vec;
     if (this.history.length > this.current_total_history) {
       this.history.shift();
     }
   }
   updatePosition() {
-    this.x += this.x_velocity;
-    this.y += this.y_velocity;
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
   }
   avoidPaddleStick() {
     // jump back from paddle to avoid getting stuck
-    this.x_velocity > 0 ? 
-    this.x -=5 : 
-    this.x += 5;
+    this.velocity.x > 0 ? (this.position.x -= 5) : (this.position.x += 5);
   }
   avoidWallStick() {
     // jump back from top and bottom walls to avoid getting stuck
-    (this.y > screen_height - this.r) ? 
-    this.y = screen_height - this.r - 2 :
-    this.y = this.r + 2;
+    this.position.y > screen_height - this.radius
+      ? (this.position.y = screen_height - this.radius - 2)
+      : (this.position.y = this.radius + 2);
   }
   update(p1, p2) {
-    let colliding_p = this.detectCollisionPaddles(p1, p2);
+    let colliding_p = this.detectCollisionPaddles([p1, p2]);
     this.updateHistory(colliding_p);
     if (this.detectCollisionTopBottomWall()) {
       this.avoidWallStick();
       this.bounceOffTopBottomWall();
-      this.time_since_last_b_collision = 0;
+      this.time_since_last_w_collision = 0;
     } else if (colliding_p) {
       this.avoidPaddleStick();
       this.bounceOffPaddle(colliding_p);
       this.time_since_last_p_collision = 0;
     }
     this.time_since_last_p_collision++;
-    this.time_since_last_b_collision++;
+    this.time_since_last_w_collision++;
     this.updatePosition();
   }
 }
