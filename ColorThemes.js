@@ -12,17 +12,15 @@ class ColorTheme {
   }
 }
 
-function changeColorTheme_aux(theme_choice) {
-  for(let i = 0; i < color_themes_arr.length; i++){
-    if(color_themes_arr[i].id == theme_choice){
-      game_state.current_color_theme = color_themes_arr[i]
+function changeColorTheme_aux(theme_choice, gs) {
+  for(let i = 0; i < gs.color_themes_arr.length; i++){
+    if(gs.color_themes_arr[i].id == theme_choice){
+      gs.current_color_theme = gs.color_themes_arr[i]
     }
   }
 }
 
-function changeColorTheme(sel) {
+function changeColorTheme(sel, gs) {
   var selected_theme = sel.options[sel.selectedIndex].value;
-  changeColorTheme_aux(selected_theme);
+  changeColorTheme_aux(selected_theme, gs);
 }
-
-var color_themes_arr = [];

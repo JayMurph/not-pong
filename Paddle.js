@@ -5,6 +5,7 @@ class Paddle {
     this.score = score;
   }
   show(color) {
+    push();
     noStroke();
     fill(color);
     rect(
@@ -13,19 +14,23 @@ class Paddle {
       this.dimension.width,
       this.dimension.height
     );
+    pop();
   }
-  updatePosition(x, y) {
-    if (y > screen_height - this.dimension.height) {
-      y = screen_height - this.dimension.height;
+  updatePosition(x, y){
+    this.position.x = x;
+    this.position.y = y;
+  }
+  update(x, y) {
+    if (y > _GAME_HEIGHT - this.dimension.height) {
+      y = _GAME_HEIGHT - this.dimension.height;
     } else if (y < 0) {
       y = 0;
     }
-    this.position.y = y;
-    if (x > screen_width - this.dimension.width) {
-      x = screen_width - this.dimension.width;
+    if (x > _GAME_WIDTH - this.dimension.width) {
+      x = _GAME_WIDTH - this.dimension.width;
     } else if (x < 0) {
       x = 0;
     }
-    this.position.x = x;
+    this.updatePosition(x, y);
   }
 }

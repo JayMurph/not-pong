@@ -15,9 +15,12 @@ class Ball {
     this.history = [];
   }
   show(ball_color, history_color) {
+    push();
+    noStroke();
     this.showHistory(history_color);
     fill(ball_color);
     ellipse(this.position.x, this.position.y, this.diameter);
+    pop();
   }
   showHistory(history_color) {
     push();
@@ -63,17 +66,17 @@ class Ball {
     }
     return false;
   }
-  detectCollisionTopBottomWall() {
+  detectCollisionTopBottomWall(game_height) {
     return (
-      (this.position.y > screen_height - this.radius ||
+      (this.position.y > game_height - this.radius ||
         this.position.y < this.radius) &&
       this.b_collision_buffer_over
     );
   }
-  detectCollisionLeftRightWall() {
+  detectCollisionLeftRightWall(game_width) {
     return (
       (this.position.x <= this.radius ||
-        this.position.x >= screen_width - this.radius) &&
+        this.position.x >= game_width - this.radius) &&
       this.b_collision_buffer_over
     );
   }
@@ -114,17 +117,17 @@ class Ball {
     // jump back from paddle to avoid getting stuck
     this.velocity.x > 0 ? (this.position.x -= 5) : (this.position.x += 5);
   }
-  avoidWallStick() {
+  avoidWallStick(game_height) {
     // jump back from top and bottom walls to avoid getting stuck
-    this.position.y > screen_height - this.radius
-      ? (this.position.y = screen_height - this.radius - 2)
+    this.position.y > game_height - this.radius
+      ? (this.position.y = game_height - this.radius - 2)
       : (this.position.y = this.radius + 2);
   }
-  update(p1, p2) {
+  update(p1, p2, game_width, game_height) {
     let colliding_p = this.detectCollisionPaddles([p1, p2]);
     this.updateHistory(colliding_p);
-    if (this.detectCollisionTopBottomWall()) {
-      this.avoidWallStick();
+    if (this.detectCollisionTopBottomWall(game_height)) {
+      this.avoidWallStick(game_height);
       this.bounceOffTopBottomWall();
       this.time_since_last_w_collision = 0;
     } else if (colliding_p) {

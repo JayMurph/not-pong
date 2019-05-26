@@ -1,5 +1,29 @@
+var _GAME_WIDTH = 800;
+var _GAME_HEIGHT = 500;
+var _ball_init_x_vel = 8;
+var _ball_init_y_vel = 3;
+var _paddle_width = 15;
+var _paddle_height = 100;
+var _paddle_dist_from_wall = 60;
+var _paddle_1_default_x = _paddle_dist_from_wall;
+var _paddle_2_default_x = _GAME_WIDTH - _paddle_width - _paddle_dist_from_wall;
+var _ball_diameter = 20;
+var _ball_default_x = _GAME_WIDTH / 2 - _ball_diameter / 2;
+var _ball_default_y = _GAME_HEIGHT / 2 - _ball_diameter / 2;
+var _game_font;
+var _bounce_sound_1;
+var _bounce_sound_2;
+
 class State {
-  constructor() {
+  constructor(
+    game_width,
+    game_height,
+    bounce_sound_1,
+    bounce_sound_2,
+    game_font
+  ) {
+    this.game_width = game_width;
+    this.game_height = game_height;
     this.new_game_flag = 1;
     this.new_round_flag = 0;
     this.you_win_flag = 0;
@@ -11,8 +35,19 @@ class State {
     this.ball;
     this.paddle_1;
     this.paddle_2;
+    this.AI_button_arr;
     this.AI_choice;
     this.Paddle_AI;
+    this.bounce_sound_1 = bounce_sound_1;
+    this.bounce_sound_2 = bounce_sound_2;
+    this.color_themes_arr;
+    this.game_font = game_font;
+    this.youWinTransition;
+    this.youLoseTransition;
+    this.newRoundTransition;
+    this.newGameTransition;
+    this.pauseTransition;
+    this.pauseToggleTimedObj;
   }
   getBC() {
     return this.current_color_theme.ball_color;
@@ -23,155 +58,174 @@ class State {
   getPC() {
     return this.current_color_theme.paddle_color;
   }
-  getTTC(){
+  getTTC() {
     return this.current_color_theme.transition_text_color;
   }
-  getBGC(){
+  getBGC() {
     return this.current_color_theme.background_color;
   }
-  getMLC(){
+  getMLC() {
     return this.current_color_theme.middle_line_color;
   }
-  getSC(){
+  getSC() {
     return this.current_color_theme.score_color;
   }
-}
-
-function scoreEvent(p1, p2, b_x) {
-  if (b_x >= screen_width) {
-    p1.score += 1;
-    game_state.new_round_flag = 1;
-  } else if (b_x <= 0) {
-    p2.score += 1;
-    game_state.new_round_flag = 1;
-  }
-  if (p1.score >= game_state.winning_score) {
-    game_state.you_win_flag = 1;
-    game_state.new_round_flag = 0;
-  }
-  if (p2.score >= game_state.winning_score) {
-    game_state.you_lose_flag = 1;
-    game_state.new_round_flag = 0;
-  }
-}
-
-function scoreShow(p1, p2) {
-  fill(game_state.getSC());
-  textSize(40);
-  text(p1.score, screen_width / 4, screen_height / 10);
-  text(p2.score, (screen_width / 4) * 3, screen_height / 10);
-}
-
-function togglePauseFlag() {
-  if (typeof this.time == "undefined") {
-    this.time = frameCount;
-    this.wait_time = 30;
-    this.last_time = this.time - this.wait_time;
-  }
-  if (
-    !game_state.mouse_off_canvas &&
-    !game_state.new_round_flag &&
-    this.time - this.last_time >= this.wait_time
-  ) {
-    if (game_state.pause_flag == 0) {
-      game_state.pause_flag = 1;
-    } else if (game_state.pause_flag == 1) {
-      game_state.pause_flag = 0;
-      pauseText.resetTime();
-    }
-    this.last_time = this.time;
-  }
-  this.time = frameCount;
-}
-
-function clickEvents() {
-  if (game_state.you_win_flag) {
-    game_state.new_game_flag = 1;
-    youWinTransition.resetTime();
-  } else if (game_state.you_lose_flag) {
-    game_state.new_game_flag = 1;
-    youLoseTransition.resetTime();
-  } else if (!game_state.new_game_flag) {
-    togglePauseFlag();
-  }
-}
-
-function setNewRoundState() {
-  game_state.ball = newBall();
-  let prev_p1_score = game_state.paddle_1.score;
-  let prev_p2_score = game_state.paddle_2.score;
-  game_state.paddle_1 = newPaddle1(prev_p1_score);
-  game_state.paddle_2 = newPaddle2(prev_p2_score);
-  game_state.paddle_AI = new PaddleAI(game_state.AI_choice);
-  game_state.new_round_flag = 0;
-}
-
-function setNewGameState() {
-  game_state.ball = newBall();
-  game_state.paddle_1 = newPaddle1(0);
-  game_state.paddle_2 = newPaddle2(0);
-  game_state.paddle_AI = new PaddleAI(game_state.AI_choice);
-  game_state.new_game_flag = 0;
-  game_state.you_win_flag = 0;
-  game_state.you_lose_flag = 0;
-  game_state.pause_flag = 0;
-}
-
-function newBall() {
-  return new Ball(
-    _ball_diameter,
-    _ball_default_x,
-    _ball_default_y,
-    randomDirection(_ball_init_x_vel),
-    randomDirection(_ball_init_y_vel),
-  );
-}
-
-function newPaddle1(prev_score) {
-  return new Paddle(
-    _paddle_1_default_x,
-    mouseY,
-    _paddle_width,
-    _paddle_height,
-    prev_score
-  );
-}
-
-function newPaddle2(prev_score) {
-  return new Paddle(
-    _paddle_2_default_x,
-    mouseY,
-    _paddle_width,
-    _paddle_height,
-    prev_score
-  );
-}
-
-function showMiddleLine() {
-  push();
-  fill(game_state.getMLC());
-  stroke(game_state.getMLC());
-  strokeWeight(5);
-  var count = 20;
-  for (var i = 1; i <= count; i += 2) {
-    line(
-      screen_width / 2,
-      (screen_height / (count + 1)) * i,
-      screen_width / 2,
-      (screen_height / (count + 1)) * (i + 1)
+  newBall() {
+    return new Ball(
+      _ball_diameter,
+      _ball_default_x,
+      _ball_default_y,
+      randomDirection(_ball_init_x_vel),
+      randomDirection(_ball_init_y_vel)
     );
   }
-  pop();
+  newPaddle1(prev_score) {
+    return new Paddle(
+      _paddle_1_default_x,
+      mouseY,
+      _paddle_width,
+      _paddle_height,
+      prev_score
+    );
+  }
+  newPaddle2(prev_score) {
+    return new Paddle(
+      _paddle_2_default_x,
+      mouseY,
+      _paddle_width,
+      _paddle_height,
+      prev_score
+    );
+  }
+  setNewRoundState() {
+    this.ball = this.newBall();
+    let prev_p1_score = this.paddle_1.score;
+    let prev_p2_score = this.paddle_2.score;
+    this.paddle_1 = this.newPaddle1(prev_p1_score);
+    this.paddle_2 = this.newPaddle2(prev_p2_score);
+    this.paddle_AI = new PaddleAI(this.AI_choice);
+    this.new_round_flag = 0;
+  }
+  setNewGameState() {
+    this.ball = this.newBall();
+    this.paddle_1 = this.newPaddle1(0);
+    this.paddle_2 = this.newPaddle2(0);
+    this.paddle_AI = new PaddleAI(this.AI_choice);
+    this.new_game_flag = 0;
+    this.you_win_flag = 0;
+    this.you_lose_flag = 0;
+    this.pause_flag = 0;
+  }
+  scoreEvent() {
+    let b_x = this.ball.position.x;
+    if (b_x >= this.game_width) {
+      this.paddle_1.score += 1;
+      this.new_round_flag = 1;
+    } else if (b_x <= 0) {
+      this.paddle_2.score += 1;
+      this.new_round_flag = 1;
+    }
+    if (this.paddle_1.score >= this.winning_score) {
+      this.you_win_flag = 1;
+      this.new_round_flag = 0;
+    }
+    if (this.paddle_2.score >= this.winning_score) {
+      this.you_lose_flag = 1;
+      this.new_round_flag = 0;
+    }
+  }
+  play() {
+    this.paddle_1.update(
+      _paddle_1_default_x,
+      mouseY - this.paddle_1.dimension.height / 2
+    );
+    this.paddle_2.update(
+      _paddle_2_default_x,
+      game_state.paddle_AI.generateRandomY(
+        this.ball.position.y,
+        this.paddle_2.dimension.height
+      )
+    );
+    this.ball.update(
+      this.paddle_1,
+      this.paddle_2,
+      this.game_width,
+      this.game_height
+    );
+    this.scoreEvent();
+  }
+  showMiddleLine() {
+    push();
+    fill(this.getMLC());
+    stroke(this.getMLC());
+    strokeWeight(5);
+    var count = 20;
+    for (var i = 1; i <= count; i += 2) {
+      line(
+        this.game_width / 2,
+        (this.game_height / (count + 1)) * i,
+        this.game_width / 2,
+        (this.game_height / (count + 1)) * (i + 1)
+      );
+    }
+    pop();
+  }
+  scoreShow() {
+    fill(game_state.getSC());
+    textSize(40);
+    text(this.paddle_1.score, this.game_width / 4, this.game_height / 10);
+    text(this.paddle_2.score, (this.game_width / 4) * 3, this.game_height / 10);
+  }
+  show() {
+    background(game_state.getBGC());
+    this.showMiddleLine();
+    this.paddle_1.show(game_state.getPC());
+    this.paddle_2.show(game_state.getPC());
+    this.ball.show(game_state.getBC(), game_state.getBHC());
+    this.scoreShow();
+  }
+  playSounds() {
+    if (
+      this.ball.detectCollisionTopBottomWall(this.game_height) ||
+      this.ball.detectCollisionLeftRightWall(this.game_width)
+    ) {
+      this.bounce_sound_2.play();
+    } else if (
+      this.ball.detectCollisionPaddles([this.paddle_1, this.paddle_2])
+    ) {
+      this.bounce_sound_1.play();
+    }
+  }
+  game() {
+    if (this.new_game_flag) {
+      this.newGameTransition.transition();
+    } else if (this.new_round_flag) {
+      this.show();
+      this.newRoundTransition.transition();
+    } else if (this.pause_flag) {
+      this.show();
+      this.pauseTransition.transition();
+    } else if (this.you_win_flag) {
+      this.show();
+      this.youWinTransition.transition();
+    } else if (this.you_lose_flag) {
+      this.show();
+      this.youLoseTransition.transition();
+    } else {
+      this.show();
+      this.play();
+      this.playSounds();
+    }
+  }
+  clickEvents() {
+    if (this.you_win_flag) {
+      this.new_game_flag = 1;
+      this.youWinTransition.resetTime();
+    } else if (this.you_lose_flag) {
+      this.new_game_flag = 1;
+      this.youLoseTransition.resetTime();
+    } else if (!this.new_game_flag) {
+      this.pauseToggleTimedObj.timedFunction();
+    }
+  }
 }
-
-var game_state = new State();
-let _ball_init_x_vel = 8;
-let _ball_init_y_vel = 3;
-let _paddle_width = 15;
-let _paddle_height = 100;
-let _paddle_dist_from_wall = 60;
-let _paddle_1_default_x = _paddle_dist_from_wall;
-let _paddle_2_default_x = screen_width - _paddle_width - _paddle_dist_from_wall;
-let _ball_diameter = 20;
-let _ball_default_x = screen_width / 2 - _ball_diameter / 2;
-let _ball_default_y = screen_height / 2 - _ball_diameter / 2;

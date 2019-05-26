@@ -46,21 +46,21 @@
         <button
           id="easy_btn"
           class="btn"
-          onclick="setActiveAI(AI_button_arr[0])"
+          onclick="setActiveAI(0, game_state)"
         >
           Easy
         </button>
         <button
           id="med_btn"
           class="btn"
-          onclick="setActiveAI(AI_button_arr[1])"
+          onclick="setActiveAI(1, game_state)"
         >
           Medium
         </button>
         <button
           id="hard_btn"
           class="btn"
-          onclick="setActiveAI(AI_button_arr[2])"
+          onclick="setActiveAI(2, game_state)"
         >
           Hard
         </button>
@@ -69,7 +69,7 @@
         <div class="controls_text">
           Color Theme
         </div>
-        <select id="color_theme_dropdown" onChange="changeColorTheme(this);">
+        <select id="color_theme_dropdown" onChange="changeColorTheme(this, game_state);">
         </select>
       </div>
     </div>
@@ -78,10 +78,10 @@
     <script src="Ball.js"></script>
     <script src="Game.js"></script>
     <script src="Transitions.js"></script>
-    <script src="Elements.js"></script>
+    <script src="AI_Buttons.js"></script>
     <script src="Setups.js"></script>
     <script src="PaddleAI.js"></script>
     <script src="ColorThemes.js"></script>
-    <script src="Sounds.js"></script>
+    <script src="Timer.js"></script>
   </body>
 </html>
