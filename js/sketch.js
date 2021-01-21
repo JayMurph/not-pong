@@ -1,9 +1,9 @@
 function preload() {
-  _bounce_sound_1 = loadSound("bounce1.wav", loaded);
-  _bounce_sound_2 = loadSound("bounce2.wav", loaded);
+  _bounce_sound_1 = loadSound("assets/bounce1.wav", loaded);
+  _bounce_sound_2 = loadSound("assets/bounce2.wav", loaded);
   _bounce_sound_1.setVolume(1);
   _bounce_sound_2.setVolume(1);
-  _game_font = loadFont("AtariClassic-Regular.ttf");
+  _game_font = loadFont("assets/AtariClassic-Regular.ttf");
 }
 
 function loaded() {}
